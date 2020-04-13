@@ -36,19 +36,16 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/pro', prosRouter);
-
-
-//加入全局token验证 2019.11.07 10:15
+//加入全局token验证(在路由前) 2019.11.07 10:15
 app.use((req, res, next) => {
-  if (req.url !== '/users/login' && req.url !== '/users/register'&& req.url !== '/banner' && req.url !== '/kind') {
+  if (req.url !== '/users/login' && req.url !== '/users/register' && req.url !== '/banner') {
     let token = req.headers.token || req.query.token || req.body.token;
     if (token) {
       jwt.verify(token, 'flower', function(err, decoded) {
         if (err) {
           res.send({ 
-            code: 10119, 
-            message: '验证token错误.'
+            code: '10119', 
+            message: '没有找到token.' 
           });
         } else {
           req.decoded = decoded;  
@@ -58,8 +55,8 @@ app.use((req, res, next) => {
       }) 
     } else {
       res.send({ 
-        code: 10119, 
-        message: '没有传入123token.' 
+        code: '10119', 
+        message: '没有找到token.' 
       });
     }
   } else {
@@ -70,6 +67,7 @@ app.use((req, res, next) => {
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/address', addRouter);
+app.use('/pro', prosRouter);
 app.use('/cart', cartRouter);
 app.use('/banner', bannerRouter);
 app.use('/comment', commentRouter);
